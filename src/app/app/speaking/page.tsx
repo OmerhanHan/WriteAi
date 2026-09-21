@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSpeakingLive } from '@/lib/speaking/useSpeakingLive'
+import { useSpeakingTts } from '@/lib/speaking/useSpeakingTts'
 import styles from './speaking.module.css'
 
 type RecStatus = 'idle' | 'listening' | 'unsupported'
@@ -44,7 +45,10 @@ export default function SpeakingPage() {
   const recRef = useRef<SpeechRec | null>(null)
   const finalRef = useRef('')
   const live = useSpeakingLive()
+  const tts = useSpeakingTts()
+  const { speakFull, stop: stopTts, enabled: ttsEnabled, setEnabled: setTtsEnabled, isSpeaking, error: ttsError } = tts
   const chatEndRef = useRef<HTMLDivElement | null>(null)
+  const lastSpokenIdRef = useRef<string | null>(null)
 
   const showToast = (m: string) => {
     setToast(m)
@@ -100,19 +104,31 @@ export default function SpeakingPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }, [live.turns, live.status])
 
+  // Auto-speak finished coach turns with local TTS
+  useEffect(() => {
+    const last = [...live.turns]
+      .reverse()
+      .find((t) => t.role === 'assistant' && !t.streaming && t.content.trim())
+
+    if (!last || last.id === lastSpokenIdRef.current) return
+    lastSpokenIdRef.current = last.id
+    speakFull(last.content)
+  }, [live.turns, speakFull])
+
   const startListening = useCallback(() => {
     const rec = recRef.current
     if (!rec) {
       showToast('⚠ Bu tarayıcıda dikte desteklenmiyor')
       return
     }
+    stopTts()
     try {
       rec.start()
       setStatus('listening')
     } catch {
       showToast('⚠ Dikte başlatılamadı')
     }
-  }, [])
+  }, [stopTts])
 
   const stopListening = useCallback(() => {
     try { recRef.current?.stop() } catch { /* ignore */ }
@@ -151,12 +167,15 @@ export default function SpeakingPage() {
     }
     stopListening()
     clearAnswer()
+    stopTts()
     await live.send(text)
   }
 
   const beginLive = async () => {
     stopListening()
     clearAnswer()
+    stopTts()
+    lastSpokenIdRef.current = null
     setSessionStarted(true)
     await live.startSession()
   }
@@ -164,12 +183,14 @@ export default function SpeakingPage() {
   const endLive = () => {
     stopListening()
     clearAnswer()
+    stopTts()
     live.reset()
+    lastSpokenIdRef.current = null
     setSessionStarted(false)
   }
 
   const displayAnswer = [transcript, interim].filter(Boolean).join(' ')
-  const coachStreaming = live.turns.some((t) => t.streaming)
+  const coachActive = live.turns.some((t) => t.streaming) || isSpeaking
 
   return (
     <main className={styles.page}>
@@ -180,6 +201,7 @@ export default function SpeakingPage() {
           <p className={styles.hSub}>
             Live Speaking
             {live.providerMeta ? ` · ${live.providerMeta.provider}/${live.providerMeta.model}` : ''}
+            {ttsEnabled ? ' · TTS' : ' · TTS off'}
           </p>
         </div>
       </header>
@@ -189,24 +211,34 @@ export default function SpeakingPage() {
           <img
             src="/characters/speaking-coach.jpeg"
             alt="Speaking coach"
-            className={`${styles.characterImage} ${coachStreaming ? styles.characterTalking : ''}`}
+            className={`${styles.characterImage} ${coachActive ? styles.characterTalking : ''}`}
           />
-          {coachStreaming && <span className={styles.liveBadge}>Live</span>}
+          {coachActive && <span className={styles.liveBadge}>{isSpeaking ? 'TTS' : 'Live'}</span>}
         </div>
 
         <section className={styles.chatBox} aria-live="polite">
           <div className={styles.chatTop}>
             <span className={styles.answerLabel}>Canlı sohbet</span>
-            {sessionStarted && (
-              <button type="button" className={styles.clearBtn} onClick={endLive}>
-                Bitir
+            <div className={styles.chatActions}>
+              <button
+                type="button"
+                className={styles.clearBtn}
+                onClick={() => setTtsEnabled(!ttsEnabled)}
+                aria-pressed={ttsEnabled}
+              >
+                {ttsEnabled ? 'Ses açık' : 'Ses kapalı'}
               </button>
-            )}
+              {sessionStarted && (
+                <button type="button" className={styles.clearBtn} onClick={endLive}>
+                  Bitir
+                </button>
+              )}
+            </div>
           </div>
 
           {!sessionStarted && (
             <p className={`${styles.answerText} ${styles.answerPlaceholder}`}>
-              Live oturumu başlat — koç Ollama üzerinden (gemma4:e4b) seninle konuşacak.
+              Live oturumu başlat — koç Ollama (gemma4:e4b) + local Piper TTS ile konuşacak.
             </p>
           )}
 
@@ -222,10 +254,22 @@ export default function SpeakingPage() {
                 key={turn.id}
                 className={`${styles.bubble} ${turn.role === 'user' ? styles.bubbleUser : styles.bubbleCoach}`}
               >
-                <span className={styles.bubbleRole}>
-                  {turn.role === 'user' ? 'Sen' : 'Koç'}
-                  {turn.streaming ? ' · …' : ''}
-                </span>
+                <div className={styles.bubbleHead}>
+                  <span className={styles.bubbleRole}>
+                    {turn.role === 'user' ? 'Sen' : 'Koç'}
+                    {turn.streaming ? ' · …' : ''}
+                  </span>
+                  {turn.role === 'assistant' && !turn.streaming && turn.content && (
+                    <button
+                      type="button"
+                      className={styles.replayBtn}
+                      onClick={() => speakFull(turn.content)}
+                      aria-label="Yanıtı seslendir"
+                    >
+                      ▶
+                    </button>
+                  )}
+                </div>
                 <p className={styles.bubbleText}>
                   {turn.content || (turn.streaming ? '…' : '')}
                 </p>
@@ -234,9 +278,8 @@ export default function SpeakingPage() {
             <div ref={chatEndRef} />
           </div>
 
-          {live.error && (
-            <p className={styles.errorNote}>{live.error}</p>
-          )}
+          {live.error && <p className={styles.errorNote}>{live.error}</p>}
+          {ttsError && <p className={styles.errorNote}>TTS: {ttsError}</p>}
         </section>
 
         <section className={styles.answerBox}>
@@ -288,9 +331,16 @@ export default function SpeakingPage() {
               {live.isBusy ? 'Koç yanıtlıyor…' : 'Koça Gönder →'}
             </button>
 
-            {live.isBusy && (
-              <button type="button" className={styles.stopStreamBtn} onClick={live.stop}>
-                Yanıtı kes
+            {(live.isBusy || isSpeaking) && (
+              <button
+                type="button"
+                className={styles.stopStreamBtn}
+                onClick={() => {
+                  live.stop()
+                  stopTts()
+                }}
+              >
+                Yanıtı / sesi kes
               </button>
             )}
           </>
@@ -305,6 +355,10 @@ export default function SpeakingPage() {
 
       {status === 'listening' && (
         <p className={styles.listeningNote} aria-live="polite">Dinleniyor… sistem diktesi aktif</p>
+      )}
+
+      {isSpeaking && (
+        <p className={styles.listeningNote} aria-live="polite">Koç konuşuyor… local TTS</p>
       )}
 
       {toast && <div className="toast">{toast}</div>}
