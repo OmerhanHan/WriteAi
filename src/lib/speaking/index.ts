@@ -1,0 +1,5 @@
+export type { ChatMessage, StreamChunk, SpeakingConfig, SpeakingProviderId } from './types'
+export { getSpeakingConfig } from './config'
+export { SPEAKING_SYSTEM_PROMPT, SPEAKING_STARTER_PROMPT } from './prompts'
+export { getSpeakingProvider } from './providers'
+export { useSpeakingLive } from './useSpeakingLive'

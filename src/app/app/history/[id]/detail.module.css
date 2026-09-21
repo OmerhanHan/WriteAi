@@ -1,0 +1,70 @@
+.page { max-width: var(--max-w); margin: 0 auto; min-height: 100vh; padding: 0 24px calc(var(--nav-h) + 32px); }
+.loading { display:flex; align-items:center; justify-content:center; height:100vh; }
+.spinnerInk { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--ink); border-radius:50%; animation:spin 0.75s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.header { display:flex; align-items:center; gap:14px; padding:36px 0 20px; border-bottom:1.5px dashed var(--border); margin-bottom:20px; }
+.back { width:38px; height:38px; border:2px solid var(--ink); border-radius:var(--radius-xs); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--ink); flex-shrink:0; box-shadow:2px 2px 0 var(--ink); transition:transform 0.1s, box-shadow 0.1s; }
+.back:hover { transform:translate(-1px,-1px); box-shadow:3px 3px 0 var(--ink); }
+.back:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+.hInfo { flex:1; }
+.hMode { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.8px; color:var(--text-3); }
+.hDate { font-family:var(--font-mono); font-size:11px; color:var(--text-3); margin-top:3px; }
+
+.topicBanner { padding:16px 0 18px; border-bottom:1.5px dashed var(--border); margin-bottom:20px; }
+.topicText { font-family:var(--font-serif); font-size:20px; line-height:1.5; margin-bottom:8px; }
+.wordsBadge { font-family:var(--font-mono); font-size:11px; color:var(--text-3); }
+
+.tabs { display:flex; border-bottom:1.5px solid var(--border); margin-bottom:24px; }
+.tab { font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:0.6px; padding:10px 20px; color:var(--text-3); border-bottom:2px solid transparent; margin-bottom:-1.5px; transition:all 0.15s; }
+.tab:hover { color:var(--text-2); }
+.tabActive { color:var(--ink) !important; border-bottom-color:var(--ink) !important; }
+
+/* Essay view */
+.essayText { font-size:15px; line-height:1.85; color:var(--text-2); white-space:pre-wrap; }
+
+/* Feedback */
+.fbWrap { display:flex; flex-direction:column; gap:24px; }
+
+/* Band gauge */
+.bandRow { display:flex; align-items:center; gap:20px; background:var(--ink); border-radius:var(--radius-xs); padding:20px; }
+.gauge { position:relative; flex-shrink:0; }
+.gaugeCenter { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.bandNum { display:block; font-family:var(--font-serif); font-size:28px; line-height:1; }
+.bandWord { display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+.bandMeta { flex:1; }
+.bandTitle { font-family:var(--font-serif); font-size:18px; color:var(--cream); margin-bottom:4px; }
+.bandSub { font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,0.45); }
+
+/* Section */
+.section { display:flex; flex-direction:column; gap:12px; }
+.secLabel { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-3); }
+
+/* Score bars */
+.scoresBox { background:var(--warm-white); border:1.5px solid var(--border); border-radius:var(--radius-xs); padding:16px; display:flex; flex-direction:column; gap:12px; }
+.scoreRow { display:flex; flex-direction:column; gap:5px; }
+.scoreHead { display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:12px; }
+.scoreLbl { color:var(--text-2); }
+.scoreVal { font-weight:600; }
+.scoreTrack { height:5px; background:var(--border); border-radius:2px; overflow:hidden; }
+.scoreFill { height:100%; border-radius:2px; transition:width 1s ease; }
+
+/* Grammar errors */
+.errors { display:flex; flex-direction:column; gap:8px; }
+.errCard { background:var(--rose-light); border:1.5px solid var(--dusty-rose); border-radius:var(--radius-xs); padding:14px; }
+.errTop { display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+.errWord { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--rose-dark); background:rgba(176,112,112,0.15); padding:2px 8px; border-radius:2px; }
+.errArrow { color:var(--text-3); font-size:12px; }
+.errFix { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--sage-dark); background:rgba(122,158,126,0.15); padding:2px 8px; border-radius:2px; }
+.errExp { font-size:13px; color:var(--text-2); line-height:1.5; }
+
+/* Suggestions */
+.suggList { background:var(--warm-white); border:1.5px solid var(--border); border-radius:var(--radius-xs); padding:16px; list-style:none; display:flex; flex-direction:column; gap:10px; }
+.suggItem { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text-2); line-height:1.55; }
+.suggDot { width:5px; height:5px; border-radius:50%; background:var(--sage-dark); flex-shrink:0; margin-top:6px; }
+
+/* Overall */
+.overall { background:var(--butter-light); border:1.5px solid var(--butter-dark); border-radius:var(--radius-xs); padding:18px; }
+.overallText { font-size:14px; color:var(--text-2); line-height:1.7; }
+
+.noFb { padding:32px 0; text-align:center; font-family:var(--font-mono); font-size:13px; color:var(--text-3); }
