@@ -58,6 +58,11 @@ export default function HomePage() {
           <span className={styles.cardTitle}>Yeni Yazı</span>
           <span className={styles.cardDesc}>PRATIK YAP →</span>
         </button>
+        <button id="home-reading" className={`${styles.mainCard} ${styles.cardRead}`} onClick={() => router.push('/app/reading')}>
+          <span className={styles.cardEmoji}>📖</span>
+          <span className={styles.cardTitle}>Okuma</span>
+          <span className={styles.cardDesc}>KÜTÜPHANE →</span>
+        </button>
         <button id="home-folder" className={`${styles.mainCard} ${styles.cardHistory}`} onClick={() => router.push('/app/history')}>
           <span className={styles.cardEmoji}>📁</span>
           <span className={styles.cardTitle}>Geçmiş</span>

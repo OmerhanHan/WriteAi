@@ -1,0 +1,84 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  background: var(--warm-white);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--cream);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.back {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 6px 0;
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+.back:hover { color: var(--ink); }
+
+.meta { min-width: 0; }
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.author {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.reader {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  /* Leave room above bottom nav */
+  padding-bottom: var(--nav-h);
+}
+
+.reader :global(.react-reader) {
+  height: 100%;
+}
+
+.reader :global(.react-reader__reader) {
+  background: var(--warm-white) !important;
+}
+
+.loading,
+.error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.error { color: var(--rose-dark); }

@@ -122,9 +122,10 @@
 .cardDesc { font-size: 12px; color: var(--text-3); font-family: var(--font-mono); }
 
 .cardWrite { background: var(--sage-light); }
+.cardRead { background: var(--slate-light); }
 .cardHistory { background: var(--butter-light); }
 .cardMeet { background: var(--rose-light); }
-/*
+
 /* ── Streak pill ── */
 .streakPill {
   display: inline-flex;
