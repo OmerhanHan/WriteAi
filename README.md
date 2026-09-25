@@ -1,3 +1,7 @@
+
+<img width="2000" height="2000" alt="WriteAi2" src="https://github.com/user-attachments/assets/8f0a2fe2-b129-47d3-8d3b-a047b161b866" />
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
